@@ -1,5 +1,4 @@
 from google import genai
-from prompts import SALES_PROMPT
 
 
 class AISalesCopilot:
@@ -11,18 +10,22 @@ class AISalesCopilot:
         return lead_information
 
     def think(self, lead_information):
+        from prompts import SALES_PROMPT
         return SALES_PROMPT.format(
             lead_information=lead_information
         )
 
     def execute(self, prompt):
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=prompt
+            )
 
-        response = self.client.models.generate_content(
-            model="gemini-flash-latest",
-            contents=prompt
-        )
+            return response.text
 
-        return response.text
+        except Exception as e:
+            return f"⚠️ Unable to analyze the lead at the moment.\n\nError: {e}"
 
     def respond(self, result):
         return result
